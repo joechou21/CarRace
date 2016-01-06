@@ -1,4 +1,7 @@
 import ddf.minim.*;
+import processing.serial.*;
+Serial port; // Create object from Serial class
+int val; // Data received from the serial port
 AudioPlayer player;
 Minim minim;//audio contexts
 PImage image1, image2, image3, image4, image5, image6, image7, image8, image9, image10;
@@ -10,8 +13,11 @@ int heartx[]=new int [3];
 int hearty[]=new int [3];
 int exist[]=new int[3];
 int finishx=200, finishy=100;
+int lastval=-1;
 void setup() {
-
+  //arduino
+  String portName = Serial.list()[0]; 
+  port = new Serial(this, portName, 9600);
   background(255);
   size(800, 1000);
   image1=loadImage("road-01.jpg");
@@ -46,6 +52,47 @@ void setup() {
   player = minim.loadFile("music.mp3", 2048);
 }
 void draw() {
+  if (0 < port.available()) { // If data is available,
+    val = port.read(); // read it and store it in val
+  }
+  
+  if (val!=lastval) {
+    println(val);
+    lastval=val;
+    if (val == 3) { // If the serial value is 0,
+      if (car3x<530) {
+        car3x = car3x+50;
+        car1y = car1y-5;
+        car2y = car2y-5;
+        car4y = car4y-5;
+        car5y = car5y-5;
+      }
+    } else if (val==4) { // If the serial value is not 0,
+      if (car3x<530) {
+        car3x = car3x+50;
+        car1y = car1y-5;
+        car2y = car2y-5;
+        car4y = car4y-5;
+        car5y = car5y-5;
+      }
+    } else if (val==1) { // If the serial value is not 0,
+      if (car3x>210) {
+        car3x = car3x-50;
+        car1y = car1y-5;
+        car2y = car2y-5;
+        car4y = car4y-5;
+        car5y = car5y-5;
+      }
+    } else if (val==2) { // If the serial value is not 0,
+      if (car3x>210) {
+        car3x = car3x-50;
+        car1y = car1y-5;
+        car2y = car2y-5;
+        car4y = car4y-5;
+        car5y = car5y-5;
+      }
+    }
+  }
   if (timeSet) {
     timerStart=millis();
   }
@@ -102,17 +149,26 @@ void draw() {
         creatCar(4);
     }
   }
-
+  /*
   if ((keyPressed == true) && (key == 'd')) {
-    if (car3x<530) {
-      car3x = car3x+20;
-    }
-  } 
-  if ((keyPressed == true) && (key == 'a')) {
-    if (car3x>210) {
-      car3x = car3x-20;
-    }
-  }
+   if (car3x<530) {
+   car3x = car3x+20;
+   car1y = car1y-5;
+   car2y = car2y-5;
+   car4y = car4y-5;
+   car5y = car5y-5;
+   }
+   } 
+   if ((keyPressed == true) && (key == 'a')) {
+   if (car3x>210) {
+   car3x = car3x-20;
+   car1y = car1y-5;
+   car2y = car2y-5;
+   car4y = car4y-5;
+   car5y = car5y-5;
+   }
+   }
+   */
   /*  println("car1 "+car1x);
    println("car2 "+car2x);
    println("car3 "+car3x);
@@ -128,15 +184,15 @@ void draw() {
     car4y-=800;
     car5y-=800;
     delay(100);
-  //  noLoop();
+    //  noLoop();
     //    println(killed);
   }
-    if (totalmiles>36000) {
+  if (totalmiles>36000) {
     fill(255, 0, 0);
     rect(finishx, finishy, 400, 20);
   }
   if ((keyPressed == true) && (key == 'w')) {
-  //  loop();
+    //  loop();
     player.play();
     gamestart=true;
     car1y = car1y+30;
@@ -182,7 +238,7 @@ void draw() {
     background(255);
     image(image9, 0, 200, 800, 800);
     textSize(80);
-    fill(0,206,209);
+    fill(0, 206, 209);
     text("your score:"+minutes+":"+seconds+":"+hundredths, 50, 150);
     player.close();
     minim.stop();
@@ -197,7 +253,6 @@ void draw() {
     textSize(150);
     text("car   race", 90, 300);
   }
-
 }
 void creatCar(int j) {
 
